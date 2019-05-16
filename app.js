@@ -1,9 +1,33 @@
+const writeFile = require('fs').writeFile;
+const csvjson = require('csvjson');
+const output = process.env.OUTPUT
+
 var client = require('./index.js');
+
+function callcsv(data)
+{
+
+    var jsondata = data;
+    const csvdata=csvjson.toCSV(jsondata,{ headers:'key'});
+    writeFile(output,csvdata,function(err){
+              if(err)
+              {
+              console.log(err);
+              throw new Error(err);
+              }
+        console.log("Please check you output file");
+    });
+}
+
+if(!output)
+{
+    console.log("Plese provide your output file :");
+}
+
 if(!client)
 {
     console.log("Cluster is Down ... !!!Please contact your service administration..");
 }
-
 
 client.search({  
     index: 'seed_target',
@@ -23,11 +47,13 @@ client.search({
       else {
         console.log("--- Response ---");
         console.log(response);
+        console.log("size listing of doc " +response.hits.hits.size)
         console.log("--- Hits ---");
-    //    response.hits.hits.forEach(function(hit){
-      //  console.log(hit);
-        console.log(response.hits.hits);
-        
-      //  })
+    //  response.hits.hits.forEach(function(hit){
+    //    console.log(hit);
+    //     })
+        console.log("total listing of doc " + response.hits.total)
+        callcsv(response)
+
       }
   });
